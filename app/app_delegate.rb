@@ -13,7 +13,7 @@ class AppDelegate
     @label.setText '...'
     @controller.view.addSubview @label
 
-    Facebook.app_id = ENV['APP_ID']
+    Facebook.app_id = NSBundle.mainBundle.objectForInfoDictionaryKey('APP_ID')
     Facebook.sign_in do |granted, error|
       if granted
         @label.setText Facebook.accounts[0].username
