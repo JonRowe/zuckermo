@@ -17,7 +17,7 @@ module Zuckermo
       end
 
       def accounts
-        self.account_store.accountsWithAccountType(account_type).collect do |ac_account|
+        (self.account_store.accountsWithAccountType(account_type) || []).collect do |ac_account|
           Zuckermo::User.new ac_account
         end
       end
@@ -25,20 +25,25 @@ module Zuckermo
       def sign_in permissions, audience, &block
         @permissions, @audience, @callback = permissions, audience, block
 
-        @options =
-          {
-            ACFacebookAppIdKey       => @app_id,
-            ACFacebookPermissionsKey => @permissions
-          }
+        if accounts.size > 0
 
-        self.account_store.requestAccessToAccountsWithType( self.account_type,
-            options: @options,
-            completion: -> granted, error do
-              Dispatch::Queue.main.sync do
-                @callback.call(granted, error)
+          @options =
+            {
+              ACFacebookAppIdKey       => @app_id,
+              ACFacebookPermissionsKey => @permissions
+            }
+
+          self.account_store.requestAccessToAccountsWithType( self.account_type,
+              options: @options,
+              completion: -> granted, error do
+                Dispatch::Queue.main.sync do
+                  @callback.call(granted, error)
+                end
               end
-            end
-        )
+          )
+        else
+          @callback.call false, NSError.alloc.initWithDomain( 'com.zuckermo.no_accounts', code: 0, userInfo: nil )
+        end
       end
 
     else # We currently don't support iOS5
