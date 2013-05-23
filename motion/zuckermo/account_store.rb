@@ -10,33 +10,50 @@ module Zuckermo
     attr_accessor :app_id
     attr_reader :account_store
 
-    def account_type
-      self.account_store.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierFacebook)
-    end
+    if defined?(ACAccountTypeIdentifierFacebook) #Check's for iOS6
 
-    def accounts
-      self.account_store.accountsWithAccountType(account_type).collect do |ac_account|
-        Zuckermo::User.new ac_account
+      def account_type
+        self.account_store.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierFacebook)
       end
-    end
 
-    def sign_in permissions, audience, &block
-      @permissions, @audience, @callback = permissions, audience, block
+      def accounts
+        self.account_store.accountsWithAccountType(account_type).collect do |ac_account|
+          Zuckermo::User.new ac_account
+        end
+      end
 
-      @options =
-        {
-          ACFacebookAppIdKey       => @app_id,
-          ACFacebookPermissionsKey => @permissions
-        }
+      def sign_in permissions, audience, &block
+        @permissions, @audience, @callback = permissions, audience, block
 
-      self.account_store.requestAccessToAccountsWithType( self.account_type,
-          options: @options,
-          completion: -> granted, error do
-            Dispatch::Queue.main.sync do
-              @callback.call(granted, error)
+        @options =
+          {
+            ACFacebookAppIdKey       => @app_id,
+            ACFacebookPermissionsKey => @permissions
+          }
+
+        self.account_store.requestAccessToAccountsWithType( self.account_type,
+            options: @options,
+            completion: -> granted, error do
+              Dispatch::Queue.main.sync do
+                @callback.call(granted, error)
+              end
             end
-          end
-      )
+        )
+      end
+
+    else # We currently don't support iOS5
+
+      def account_type
+        raise NotImplemented
+      end
+
+      def accounts
+        []
+      end
+
+      def sign_in permissions, audience, &block
+        block.call false, NotImplemented
+      end
     end
 
   end
