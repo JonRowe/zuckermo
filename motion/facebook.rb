@@ -1,6 +1,10 @@
 module Facebook
   class << self
 
+    def supported?
+      zuckermo.facebook_supported?
+    end
+
     def app_id= id
       zuckermo.app_id = id
     end
