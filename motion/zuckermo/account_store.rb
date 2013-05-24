@@ -10,21 +10,28 @@ module Zuckermo
     attr_accessor :app_id
     attr_reader :account_store
 
-    if defined?(ACAccountTypeIdentifierFacebook) #Check's for iOS6
+    def facebook_supported?
+      UIDevice.currentDevice.systemVersion.to_f >= 6
+    end
 
-      def account_type
+    def account_type
+      if facebook_supported?
         self.account_store.accountTypeWithAccountTypeIdentifier(ACAccountTypeIdentifierFacebook)
+      else
+        nil
       end
+    end
 
-      def accounts
-        (self.account_store.accountsWithAccountType(account_type) || []).collect do |ac_account|
-          Zuckermo::User.new ac_account
-        end
+    def accounts
+      (self.account_store.accountsWithAccountType(account_type) || []).collect do |ac_account|
+        Zuckermo::User.new ac_account
       end
+    end
 
-      def sign_in permissions, audience, &block
-        @permissions, @audience, @callback = permissions, audience, block
+    def sign_in permissions, audience, &block
+      @permissions, @audience, @callback = permissions, audience, block
 
+      if facebook_supported?
         @options =
           {
             ACFacebookAppIdKey       => @app_id,
@@ -39,22 +46,16 @@ module Zuckermo
               end
             end
         )
-      end
-
-    else # We currently don't support iOS5
-
-      def account_type
-        raise NotImplemented
-      end
-
-      def accounts
-        []
-      end
-
-      def sign_in permissions, audience, &block
-        block.call false, NotImplemented
+      else
+        @callback.call false, unsupported_error
       end
     end
+
+    private
+
+      def unsupported_error
+        NSError.errorWithDomain('com.zuckermo.unsupported_ios_version', code: 0, userInfo:nil)
+      end
 
   end
 end
