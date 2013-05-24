@@ -13,4 +13,5 @@ Motion::Project::App.setup do |app|
   app.name = 'Zuckermo'
   app.identifier = 'com.zuckermo.test'
   app.info_plist['APP_ID'] = ENV['APP_ID']
+  app.deployment_target = "5.1"
 end

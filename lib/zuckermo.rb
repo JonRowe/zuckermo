@@ -12,6 +12,5 @@ Motion::Project::App.setup do |app|
     app.files.unshift(file)
   end
   app.frameworks += ["Facebook", "Accounts"]
-  app.deployment_target = "5.1"
 
 end
