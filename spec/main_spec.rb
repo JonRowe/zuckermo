@@ -8,10 +8,10 @@ describe "Accessing a Facebook account" do
   it 'allows us to retrieve the users name' do
     if Facebook.accounts.size > 0
       wait 1 do
-        tap 'ok'
+        tap 'OK'
       end
       wait 1
-      view('username').text.should.equal ENV['USER']
+      view('username').text.should.equal ENV['FBUSER']
     else
       warn "\n\n!!!!!!!!!!!!!\n\n No acounts on simulator"
       view('username').text.should.equal 'Fail... See Log'
