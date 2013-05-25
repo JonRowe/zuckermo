@@ -4,20 +4,31 @@ Hat Tip to clayallsopp/twittermotion for inspiration
 
 ## Usage
 
+Setup:
+
+```ruby
+Facebook.app_id = 'xxxxxxxxx'
+```
+
+Note you must configure your `app_id` to one registered with facebook, you must also
+set this app to allow iOS sign in and set your bundle id.
+
 Sign in:
 
 ```ruby
-Facebook.app_key = 'xxxxxxxxx'
-Facebook.sign_in do |granted, ns_error|
+Facebook.sign_in permissions, audience do |granted, ns_error|
   # have fun
 end
 ```
+
+You must supply permissions, we ask for `['email']` by default, which is the most basic
+level of permissions we can ask for (facebook refers to this as basic info).
 
 See accounts:
 
 ```ruby
 > Facebook.accounts
-=> [#<Twitter::User>]
+=> [#<Facebook::User>]
 > Facebook.accounts[0].username
 => "name@example.com"
 ```
