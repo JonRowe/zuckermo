@@ -1,4 +1,6 @@
 # Zuckermo
+[![Code Climate](https://codeclimate.com/github/JonRowe/zuckermo.png)](https://codeclimate.com/github/JonRowe/zuckermo)
+
 ## A RubyMotion wrapper for Facebook.
 
 Hat Tip to clayallsopp/twittermotion for inspiration
